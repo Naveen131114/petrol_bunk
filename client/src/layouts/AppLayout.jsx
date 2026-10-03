@@ -1,0 +1,4 @@
+import { NavLink, Outlet } from 'react-router-dom';
+import { useAuth } from '../features/auth/AuthContext.jsx';
+const links = [['/', 'Dashboard'], ['/day-entries', 'Day Entry'], ['/fuel-inwards', 'Fuel Inwards'], ['/reconciliation', 'Stock'], ['/branches', 'Branches'], ['/reports', 'Reports']];
+export function AppLayout() { const { user, logout } = useAuth(); return <div className="app-shell"><aside><div className="brand"><span>⛽</span> FuelFlow</div><nav>{links.map(([to, name]) => <NavLink key={to} to={to} end={to === '/'}>{name}</NavLink>)}</nav><div className="profile"><strong>{user?.name}</strong><small>{user?.role?.replace('_', ' ')}</small><button onClick={logout}>Sign out</button></div></aside><main><div className="topbar"><select aria-label="Selected branch"><option>All branches</option></select><span>03 Oct 2026</span></div><Outlet /></main></div>; }
