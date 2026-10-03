@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { z } from 'zod';
+import { preview, save } from '../controllers/reconciliation.controller.js';
+import { allowBranch, allowPermission, authenticate } from '../middleware/auth.js';
+import { validate, validateQuery } from '../middleware/validate.js';
+const router = Router();
+const payload = z.object({ branchId: z.string().regex(/^[a-f\d]{24}$/i), fuelType: z.enum(['PETROL', 'DIESEL']), periodStart: z.coerce.date(), periodEnd: z.coerce.date(), physicalClosingStock: z.number().nonnegative(), reason: z.string().max(500).optional() }).refine((data) => data.periodEnd >= data.periodStart, { message: 'Period end must not precede period start.' });
+router.use(authenticate);
+router.get('/preview', validateQuery(payload), allowBranch((req) => req.query.branchId), preview);
+router.post('/', allowPermission('EDIT_AND_CREATE'), validate(payload), allowBranch(), save);
+export default router;
